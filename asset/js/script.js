@@ -13,6 +13,18 @@ const restartBtn = document.getElementById("restartBtn");
 const timeDisplay = document.getElementById("time");
 const attemptsDisplay = document.getElementById("attempts");
 
+// Mapeamento dos tópicos e explicações
+const topicExplanations = {
+    "Exclusões": "Aspectos que não estão incluindo no escopo e não serão entregues",
+    "Controle": "Processo de monitorar e gerenciar mudanças para evitar o 'scope creep'",
+    "Verificação": "Processo de obter aceitação formal das entregas do projeto pelos stakeholders",
+    "Refinamento": "Ajuste detalhado dos requisitos para definir o escopo com precisão",
+    "Planejamento": "Processo de desenvolver uma abordagem para o gerenciamento de escopo",
+    "Mudanças": "Alterações que precisam de aprovação formal para serem incluídas no projeto",
+    "Revisão": "A avaliação periódica do escopo para garantir que está sendo seguido conforme planejado",
+    "Limitações": "Restrições específicas do projeto que limitam a execução do escopo",
+};
+
 startBtn.addEventListener("click", startGame);
 stopBtn.addEventListener("click", stopGame);
 restartBtn.addEventListener("click", restartGame);
@@ -64,8 +76,17 @@ function flipCard(e) {
 }
 
 function checkForMatch() {
-    const isMatch = cardOne.querySelector(".back-view h4").innerText === cardTwo.querySelector(".back-view h4").innerText;
-    isMatch ? disableCards() : unflipCards();
+    const textOne = cardOne.querySelector(".back-view h4").innerText;
+    const textTwo = cardTwo.querySelector(".back-view h4").innerText;
+    const isMatch = textOne === textTwo;
+
+    if (isMatch) {
+        // Mostra explicação do par correto
+        alert(topicExplanations[textOne]);
+        disableCards();
+    } else {
+        unflipCards();
+    }
 }
 
 function disableCards() {
@@ -104,14 +125,20 @@ function shuffleCards() {
     });
 }
 
-function checkForCompletion() {
-    const flippedCards = document.querySelectorAll(".card.flip");
-    if (flippedCards.length === cards.length) {
-        setTimeout(() => {
-            alert("Parabéns! Você completou o jogo!");
-            restartGame();
-        }, 500);
-    }
+function checkForMatch() {
+    const textOne = cardOne.querySelector(".back-view h4").innerText;
+    const textTwo = cardTwo.querySelector(".back-view h4").innerText;
+    const isMatch = textOne === textTwo;
+
+    setTimeout(() => { // Aguardar um pouco antes de exibir a explicação
+        if (isMatch) {
+            // Mostra explicação do par correto
+            alert(topicExplanations[textOne]);
+            disableCards();
+        } else {
+            unflipCards();
+        }
+    }, 500); // Tempo suficiente para que a animação de virar as cartas seja concluída
 }
 
 stopGame();
