@@ -13,7 +13,6 @@ const restartBtn = document.getElementById("restartBtn");
 const timeDisplay = document.getElementById("time");
 const attemptsDisplay = document.getElementById("attempts");
 
-// Mapeamento dos tópicos e explicações
 const topicExplanations = {
     "Exclusões": "Aspectos que não estão incluindo no escopo e não serão entregues",
     "Controle": "Processo de monitorar e gerenciar mudanças para evitar o 'scope creep'",
@@ -30,115 +29,107 @@ stopBtn.addEventListener("click", stopGame);
 restartBtn.addEventListener("click", restartGame);
 
 function startGame() {
-    if (isGameActive) return;
-    isGameActive = true;
-    lockBoard = false;
-    shuffleCards();
-    startTimer();
-    cards.forEach(card => card.addEventListener("click", flipCard));
+  if (isGameActive) return;
+  isGameActive = true;
+  lockBoard = false;
+  shuffleCards();
+  startTimer();
+  cards.forEach(card => card.addEventListener("click", flipCard));
 }
 
 function stopGame() {
-    isGameActive = false;
-    clearInterval(timerInterval);
-    cards.forEach(card => card.removeEventListener("click", flipCard));
+  isGameActive = false;
+  clearInterval(timerInterval);
+  cards.forEach(card => card.removeEventListener("click", flipCard));
 }
 
 function restartGame() {
-    stopGame();
-    attempts = 0;
-    seconds = 0;
-    timeDisplay.textContent = "00:00";
-    attemptsDisplay.textContent = attempts;
-    cards.forEach(card => card.classList.remove("flip"));
-    shuffleCards();
-    startGame();
+  stopGame();
+  attempts = 0;
+  seconds = 0;
+  timeDisplay.textContent = "00:00";
+  attemptsDisplay.textContent = attempts;
+  cards.forEach(card => card.classList.remove("flip"));
+  shuffleCards();
+  startGame();
 }
 
 function flipCard(e) {
-    if (!isGameActive || lockBoard) return;
-    let clickedCard = e.target.closest(".card");
+  if (!isGameActive || lockBoard) return;
+  let clickedCard = e.target.closest(".card");
 
-    if (!clickedCard || clickedCard.classList.contains("flip") || clickedCard === cardOne) return;
+  if (!clickedCard || clickedCard.classList.contains("flip") || clickedCard === cardOne) return;
 
-    clickedCard.classList.add("flip");
+  clickedCard.classList.add("flip");  
 
-    if (!cardOne) {
-        cardOne = clickedCard;
-        return;
-    }
+  if (!cardOne) {
+    cardOne = clickedCard;
+    return;
+  }
 
-    cardTwo = clickedCard;
-    lockBoard = true;
-    attempts++;
-    attemptsDisplay.textContent = attempts;
-    checkForMatch();
+  cardTwo = clickedCard;
+  lockBoard = true;
+  attempts++;
+  attemptsDisplay.textContent = attempts;
+
+  setTimeout(checkForMatch, 1000); 
 }
 
 function checkForMatch() {
-    const textOne = cardOne.querySelector(".back-view h4").innerText;
-    const textTwo = cardTwo.querySelector(".back-view h4").innerText;
-    const isMatch = textOne === textTwo;
+  const textOne = cardOne.querySelector(".back-view h4").innerText;
+  const textTwo = cardTwo.querySelector(".back-view h4").innerText;
+  const isMatch = textOne === textTwo;
 
-    if (isMatch) {
-        // Mostra explicação do par correto
-        alert(topicExplanations[textOne]);
-        disableCards();
-    } else {
-        unflipCards();
-    }
+  if (isMatch) {
+    alert(topicExplanations[textOne]);
+    disableCards();
+  } else {
+    unflipCards();
+  }
 }
 
 function disableCards() {
-    cardOne.removeEventListener("click", flipCard);
-    cardTwo.removeEventListener("click", flipCard);
-    resetBoard();
-    checkForCompletion();
+  cardOne.removeEventListener("click", flipCard);
+  cardTwo.removeEventListener("click", flipCard);
+  resetBoard();
+  checkForCompletion();
 }
 
 function unflipCards() {
-    setTimeout(() => {
-        cardOne.classList.remove("flip");
-        cardTwo.classList.remove("flip");
-        resetBoard();
-    }, 1000);
+  setTimeout(() => {
+    cardOne.classList.remove("flip");
+    cardTwo.classList.remove("flip");
+    resetBoard();
+  }, 1000); 
 }
 
 function resetBoard() {
-    [cardOne, cardTwo] = [null, null];
-    lockBoard = false;
+  [cardOne, cardTwo] = [null, null];
+  lockBoard = false;
 }
 
 function startTimer() {
-    timerInterval = setInterval(() => {
-        seconds++;
-        const minutes = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        timeDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-    }, 1000);
+  timerInterval = setInterval(() => {
+    seconds++;
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    timeDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }, 1000);
 }
 
 function shuffleCards() {
-    cards.forEach(card => {
-        const randomPos = Math.floor(Math.random() * 16);
-        card.style.order = randomPos;
-    });
+  cards.forEach(card => {
+    const randomPos = Math.floor(Math.random() * 16);
+    card.style.order = randomPos;
+  });
 }
 
-function checkForMatch() {
-    const textOne = cardOne.querySelector(".back-view h4").innerText;
-    const textTwo = cardTwo.querySelector(".back-view h4").innerText;
-    const isMatch = textOne === textTwo;
-
-    setTimeout(() => { // Aguardar um pouco antes de exibir a explicação
-        if (isMatch) {
-            // Mostra explicação do par correto
-            alert(topicExplanations[textOne]);
-            disableCards();
-        } else {
-            unflipCards();
-        }
-    }, 500); // Tempo suficiente para que a animação de virar as cartas seja concluída
+function checkForCompletion() {
+  const allFlipped = [...cards].every(card => card.classList.contains("flip"));
+  if (allFlipped) {
+    stopGame();
+    alert("Parabéns! Você encontrou todas as cartas! "); 
+  }
 }
 
 stopGame();
