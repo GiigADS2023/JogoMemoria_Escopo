@@ -127,6 +127,7 @@ function shuffleCards() {
 function checkForCompletion() {
   const allFlipped = [...cards].every(card => card.classList.contains("flip"));
   if (allFlipped) {
+    restartGame();
     stopGame();
     alert("Parabéns! Você encontrou todas as cartas! "); 
   }
